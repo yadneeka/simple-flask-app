@@ -1,0 +1,14 @@
+# Set variables
+IMAGE_NAME=<your-dockerhub-username>/<your-app>
+GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)
+
+# Build docker image
+docker build -t ${IMAGE_NAME}:${BUILD_ID} -t ${IMAGE_NAME}:${GIT_COMMIT_SHORT} .
+
+# Run container
+docker run -d -p 5000:5000 --name ${JOB_NAME}-${BUILD_ID} ${IMAGE_NAME}:${BUILD_ID}
+
+
+echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+docker push ${IMAGE_NAME}:${BUILD_ID}
+docker push ${IMAGE_NAME}:${GIT_COMMIT_SHORT}
